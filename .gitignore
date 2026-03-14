@@ -1,0 +1,9 @@
+node_modules/
+.env
+*.log
+build_output.txt
+temp/
+index_test.js
+test.js
+test.jsx
+*.tmp
