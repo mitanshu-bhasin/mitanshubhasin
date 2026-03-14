@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 | Page Not Found</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Fira+Code:wght@400;700&family=Orbitron:wght@500;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { transition: background-color 0.3s ease, color 0.3s ease; overflow: hidden; }
+        
+        /* --- LIGHT THEME (Default) --- */
+        body.light-mode {
+            background-color: #f8fafc;
+            color: #1e293b;
+            font-family: 'Inter', sans-serif;
+        }
+        .light-mode .cyber-element { display: none; }
+        .light-mode .btn-primary {
+            background-color: #0f172a; color: white; border: 1px solid #0f172a;
+        }
+        .light-mode .btn-primary:hover {
+            background-color: #334155;
+        }
+
+        /* --- DARK / CYBER THEME --- */
+        body.dark-mode {
+            background-color: #000;
+            color: #f8fafc;
+            font-family: 'Fira Code', monospace;
+        }
+        body.dark-mode .font-cyber { font-family: 'Orbitron', sans-serif; }
+        
+        /* Glitch Effect (Only in Dark Mode) */
+        .dark-mode .glitch { position: relative; }
+        .dark-mode .glitch::before, .dark-mode .glitch::after {
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
+        .dark-mode .glitch::before {
+            left: 2px; text-shadow: -1px 0 red; clip: rect(24px, 550px, 90px, 0); animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+        .dark-mode .glitch::after {
+            left: -2px; text-shadow: -1px 0 blue; clip: rect(85px, 550px, 140px, 0); animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim-2 { 0% { clip: rect(104px, 9999px, 129px, 0); } 100% { clip: rect(15px, 9999px, 110px, 0); } }
+
+        /* Scanline (Only in Dark Mode) */
+        .dark-mode .scanlines {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px; pointer-events: none; z-index: 10; display: block;
+        }
+
+        .dark-mode .btn-primary {
+            background-color: transparent; color: #f8fafc; border: 1px solid #00ff41;
+        }
+        .dark-mode .btn-primary:hover {
+            background-color: #f8fafc; color: black; box-shadow: 0 0 15px #00ff41;
+        }
+    </style>
+</head>
+<body class="light-mode flex items-center justify-center h-screen flex-col text-center p-4 relative">
+    
+    <!-- Cyber Elements (Hidden in Light Mode) -->
+    <div class="scanlines cyber-element"></div>
+    <canvas id="matrix" class="fixed top-0 left-0 w-full h-full opacity-20 pointer-events-none z-0 cyber-element"></canvas>
+
+    <!-- Theme Toggle -->
+    <button onclick="toggleTheme()" class="absolute top-6 right-6 p-3 rounded-full transition-all z-50 hover:bg-gray-200 dark-hover:bg-green-900 border border-transparent dark-border:border-green-500">
+        <i data-lucide="moon" class="block dark-hidden w-6 h-6 text-slate-700"></i>
+        <i data-lucide="sun" class="hidden dark-block w-6 h-6 text-yellow-400 cyber-element" style="display:none"></i>
+    </button>
+
+    <div class="z-20 relative">
+        <h1 class="text-9xl font-black mb-4 glitch transition-all" data-text="404">404</h1>
+        
+        <h2 id="subtitle" class="text-2xl md:text-4xl font-bold mb-6 transition-colors duration-300">
+            Page Not Found
+        </h2>
+        
+        <p id="desc" class="mb-8 max-w-lg mx-auto text-lg transition-colors duration-300 text-slate-500">
+            Oops! The page you are looking for doesn't exist. It might have been moved or deleted.
+        </p>
+        
+        <a href="/" class="btn-primary inline-block px-8 py-3 rounded-lg font-bold tracking-wider transition-all uppercase">
+            Return Home
+        </a>
+    </div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        const body = document.body;
+        const matrixCanvas = document.getElementById('matrix');
+        const sunIcon = document.querySelector('i[data-lucide="sun"]');
+        const moonIcon = document.querySelector('i[data-lucide="moon"]');
+        const subtitle = document.getElementById('subtitle');
+        const desc = document.getElementById('desc');
+
+        function toggleTheme() {
+            if (body.classList.contains('light-mode')) {
+                // Switch to Dark/Cyber
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                
+                // Show Cyber Elements
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+                
+                // Update Text for Vibe
+                subtitle.innerText = "SYSTEM BREACH DETECTED";
+                subtitle.classList.remove('text-slate-800');
+                subtitle.classList.add('text-red-500', 'tracking-widest');
+                
+                desc.innerHTML = "Coordinates corrupted. This sector is restricted.<br><span class='text-green-500 text-xs mt-2 block'>> ERROR_CODE: LOST_IN_CYBERSPACE</span>";
+                desc.classList.remove('text-slate-500');
+                desc.classList.add('text-gray-400');
+
+                startMatrix();
+            } else {
+                // Switch to Light
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+                
+                // Hide Cyber Elements
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+
+                // Update Text for Professional Vibe
+                subtitle.innerText = "Page Not Found";
+                subtitle.classList.remove('text-red-500', 'tracking-widest');
+                subtitle.classList.add('text-slate-800');
+
+                desc.innerHTML = "Oops! The page you are looking for doesn't exist. It might have been moved or deleted.";
+                desc.classList.remove('text-gray-400');
+                desc.classList.add('text-slate-500');
+
+                stopMatrix();
+            }
+        }
+
+        // --- Matrix Effect Logic ---
+        const ctx = matrixCanvas.getContext('2d');
+        let matrixInterval;
+
+        function startMatrix() {
+            matrixCanvas.width = window.innerWidth;
+            matrixCanvas.height = window.innerHeight;
+            const chars = '01MITANSHU';
+            const columns = matrixCanvas.width / 20;
+            const drops = Array(Math.floor(columns)).fill(1);
+
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+                ctx.fillStyle = '#0F0';
+                ctx.font = '15px monospace';
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(text, i * 20, drops[i] * 20);
+                    if (drops[i] * 20 > matrixCanvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+            }
+            matrixInterval = setInterval(draw, 50);
+        }
+
+        function stopMatrix() {
+            clearInterval(matrixInterval);
+            ctx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+        }
+
+        window.addEventListener('resize', () => { 
+            if(body.classList.contains('dark-mode')) {
+                matrixCanvas.width = window.innerWidth; 
+                matrixCanvas.height = window.innerHeight; 
+            }
+        });
+    </script>
+
+<script async id="netlify-rum-container" src="/.netlify/scripts/rum" data-netlify-rum-site-id="65cba0b0-a094-450c-bedd-61028e1b6e82" data-netlify-deploy-branch="" data-netlify-deploy-context="production" data-netlify-cwv-token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiNjVjYmEwYjAtYTA5NC00NTBjLWJlZGQtNjEwMjhlMWI2ZTgyIiwiYWNjb3VudF9pZCI6IjY5MWVlMTE5ZDQ2NzU3NDA1YTMxNWE2OCIsImRlcGxveV9pZCI6IjY5OGYzZThjNjZhZWUwMWYxZTQ2MDIzNyIsImlzc3VlciI6Im5mc2VydmVyIn0.ObEN6JR_oY-hKV-JZLrooQTzoEGZTmyULkE1CyvY50Y"></script></body>
+</html>

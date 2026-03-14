@@ -1,0 +1,1171 @@
+const { useState, useEffect, useRef, useCallback } = React;
+
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_x18I169I-SBhHlCDqNzQE8hfbTpckOY",
+            authDomain: "mitanshu-6a6f6.firebaseapp.com",
+            projectId: "mitanshu-6a6f6",
+            storageBucket: "mitanshu-6a6f6.firebasestorage.app",
+            messagingSenderId: "9018733180",
+            appId: "1:9018733180:web:b370745799ade283f5cff9",
+            measurementId: "G-294BT4167H"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // --- ICONS ---
+        const Icons = {
+            Terminal: ({size=24, className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>,
+            Sun: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>,
+            Moon: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>,
+            Shield: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>,
+            Menu: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>,
+            X: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
+            Trash: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>,
+            Edit: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>,
+            Lock: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
+            Link: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>,
+            Bot: ({size=24, className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>,
+            Image: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>,
+            Phone: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>,
+            Instagram: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>,
+            Linkedin: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>,
+            MessageCircle: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>,
+            Globe: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>,
+            Server: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>,
+            Cpu: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>,
+            User: ({size=24}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>,
+            ArrowUp: ({size=24, className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>,
+            Star: ({size=24, className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>,
+            Zap: ({size=24, className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>,
+            Wrench: ({size=24, className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none" className={className}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>,
+            Megaphone: ({size=24, className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 11l18-5v12L3 14v-3z"></path><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path></svg>
+        };
+
+        // --- ANIMATIONS & COMPONENTS ---
+
+        const AnnouncementBar = ({ config }) => {
+            if (!config && config.active && config.text || !config && config.text) return null;
+            return (
+                <div className="fixed top-20 md:top-24 left-1/2 -translate-x-1/2 w-[90%] max-w-4xl z-[35] animate-slideDown pointer-events-none">
+                     <div className="bg-yellow-400 text-black px-6 py-3 rounded-full shadow-[0_0_20px_rgba(250,204,21,0.5)] flex items-center justify-center gap-3 font-bold text-xs md:text-sm tracking-widest border-2 border-yellow-500 backdrop-blur-xl">
+                        <Icons.Megaphone size={16} className="animate-bounce" />
+                        <span className="uppercase">{config.text}</span>
+                     </div>
+                </div>
+            );
+        };
+
+        const ScrollProgress = () => {
+            const [width, setWidth] = useState(0);
+            useEffect(() => {
+                const handleScroll = () => {
+                    const totalHeight = document.body.scrollHeight - window.innerHeight;
+                    const progress = (window.scrollY / totalHeight) * 100;
+                    setWidth(progress);
+                };
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+            return (
+                <div className="scroll-progress-container">
+                    <div className="scroll-progress-bar" style={{ width: `${width}%` }}></div>
+                </div>
+            );
+        };
+
+        const BackToTop = ({ theme }) => {
+            const [visible, setVisible] = useState(false);
+            useEffect(() => {
+                const toggleVisibility = () => setVisible(window.scrollY > 300);
+                window.addEventListener('scroll', toggleVisibility);
+                return () => window.removeEventListener('scroll', toggleVisibility);
+            }, []);
+            const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            if (!visible) return null;
+            return (
+                <button 
+                    onClick={scrollToTop} 
+                    className={`fixed bottom-24 right-6 z-40 p-3 rounded-full shadow-lg transition-all hover:scale-110 hover:-translate-y-1 animate-zoom ${theme === 'light' ? 'bg-slate-800 text-white hover:bg-slate-900' : 'bg-blue-600 text-black border border-blue-400'}`}
+                >
+                    <Icons.ArrowUp size={20} />
+                </button>
+            );
+        };
+
+        const NeuralNetwork = () => {
+            const canvasRef = useRef(null);
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                let width = canvas.width = window.innerWidth;
+                let height = canvas.height = window.innerHeight;
+                let particles = [];
+                // Reduced particle count for better performance on weak devices
+                const particleCount = window.innerWidth < 768 ? 30 : 60;
+                
+                for(let i=0; i<particleCount; i++) particles.push({x: Math.random()*width, y: Math.random()*height, vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5});
+                const animate = () => {
+                    ctx.clearRect(0,0,width,height);
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
+                    particles.forEach((p, i) => {
+                        p.x += p.vx; p.y += p.vy;
+                        if(p.x < 0 || p.x > width) p.vx *= -1;
+                        if(p.y < 0 || p.y > height) p.vy *= -1;
+                        ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2); ctx.fill();
+                        for(let j=i+1; j<particles.length; j++) {
+                            const p2 = particles[j];
+                            const dist = Math.hypot(p.x-p2.x, p.y-p2.y);
+                            if(dist < 120) {
+                                ctx.lineWidth = 1 - dist/120;
+                                ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+                            }
+                        }
+                    });
+                    requestAnimationFrame(animate);
+                };
+                const animId = requestAnimationFrame(animate);
+                const resize = () => { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; };
+                window.addEventListener('resize', resize);
+                return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', resize); };
+            }, []);
+            return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full -z-10 opacity-60 pointer-events-none" />;
+        };
+
+        const MatrixRain = ({ color }) => {
+            const canvasRef = useRef(null);
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                const columns = canvas.width / 20;
+                const drops = Array(Math.floor(columns)).fill(1);
+                const draw = () => {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = color;
+                    ctx.font = '14px monospace';
+                    for (let i = 0; i < drops.length; i++) {
+                        const text = String.fromCharCode(0x30A0 + Math.random() * 96);
+                        ctx.fillText(text, i * 20, drops[i] * 20);
+                        if (drops[i] * 20 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                        drops[i]++;
+                    }
+                };
+                const interval = setInterval(draw, 50);
+                const handleResize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+                window.addEventListener('resize', handleResize);
+                return () => { clearInterval(interval); window.removeEventListener('resize', handleResize); };
+            }, [color]);
+            return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full -z-10 opacity-30 pointer-events-none" />;
+        };
+
+        const TextScramble = ({ text, className }) => {
+            const [display, setDisplay] = useState(text);
+            const chars = '!<>-_\\/[]{}—=+*^?#________';
+            useEffect(() => {
+                let iteration = 0;
+                const interval = setInterval(() => {
+                    setDisplay(text.split('').map((letter, index) => {
+                        if(index < iteration) return text[index];
+                        return chars[Math.floor(Math.random() * chars.length)];
+                    }).join(''));
+                    if(iteration >= text.length) clearInterval(interval);
+                    iteration += 1/3;
+                }, 30);
+                return () => clearInterval(interval);
+            }, [text]);
+            return <span className={className}>{display}</span>;
+        };
+
+        const TiltCard = ({ children, className }) => {
+            const cardRef = useRef(null);
+            const handleMove = (e) => {
+                if(window.innerWidth < 768) return; 
+                const card = cardRef.current;
+                const { left, top, width, height } = card.getBoundingClientRect();
+                const x = (e.clientX - left) / width;
+                const y = (e.clientY - top) / height;
+                const tiltX = (0.5 - y) * 15;
+                const tiltY = (x - 0.5) * 15;
+                card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.02)`;
+            };
+            const handleLeave = () => { cardRef.current.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)'; };
+            return (
+                <div ref={cardRef} onMouseMove={handleMove} onMouseLeave={handleLeave} className={`tilt-card ${className}`}>
+                    {children}
+                </div>
+            );
+        };
+
+        // --- NEW PROJECT MODAL (PDF STYLE) ---
+        const ProjectModal = ({ project, onClose, theme }) => {
+            if (!project) return null;
+            return (
+                <div className="fixed inset-0 z-[100] bg-[#0f172a]/90 backdrop-blur-sm flex items-center justify-center p-4 animate-zoom" onClick={onClose}>
+                    <div className={`w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl relative flex flex-col md:flex-row ${theme === 'light' ? 'bg-white text-slate-900' : 'bg-slate-900 text-blue-400 border border-blue-500'}`} onClick={e => e.stopPropagation()}>
+                        <button onClick={onClose} className="absolute top-4 right-4 z-10 p-2 hover:bg-gray-200 dark:hover:bg-slate-800 rounded-full transition-colors"><Icons.X /></button>
+                        
+                        {/* Fake PDF Sidebar */}
+                        <div className={`hidden md:flex flex-col w-1/4 p-6 border-r ${theme === 'light' ? 'bg-gray-50 border-gray-200' : 'bg-[#0f172a] border-slate-700'}`}>
+                            <div className="text-xs font-bold uppercase tracking-widest opacity-50 mb-4">Document Info</div>
+                            <div className="space-y-4 text-sm">
+                                <div>
+                                    <div className="opacity-70 text-xs">Project Name</div>
+                                    <div className="font-bold">{project.title}</div>
+                                </div>
+                                <div>
+                                    <div className="opacity-70 text-xs">Date</div>
+                                    <div className="font-mono">{project.createdAt ? new Date(project.createdAt.seconds * 1000).toLocaleDateString() : 'Classified'}</div>
+                                </div>
+                                {project.isComplex && (
+                                    <div className="p-2 bg-yellow-500/10 border border-yellow-500 rounded text-yellow-600 text-xs font-bold text-center">
+                                        ⭐ FLAGSHIP SYSTEM
+                                    </div>
+                                )}
+                                <div>
+                                    <div className="opacity-70 text-xs">Tech Stack</div>
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                        {project.tags && project.tags.map((t,i) => (
+                                            <span key={i} className="text-[10px] border px-1 rounded opacity-70">{t}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Main Content */}
+                        <div className="flex-1 p-8 md:p-12 overflow-y-auto">
+                            <div className="mb-8 pb-4 border-b border-dashed border-current opacity-30 flex justify-between items-end">
+                                <h1 className="text-3xl font-bold font-heading">{project.title}</h1>
+                                <div className="text-xs font-mono opacity-70">CONFIDENTIAL // PROJECT FILE</div>
+                            </div>
+                            
+                            <div className="prose max-w-none mb-8 leading-relaxed whitespace-pre-wrap font-sans text-sm md:text-base">
+                                {project.desc}
+                            </div>
+
+                            {project.link && (
+                                <div className="mt-8 pt-6 border-t border-current opacity-80">
+                                    <a href={project.link} target="_blank" className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all ${theme === 'light' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-black hover:bg-blue-500'}`}>
+                                        <Icons.Link size={18}/> LAUNCH DEPLOYMENT
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- NEW IMAGE MODAL (HOISTED) ---
+        const ImageModal = ({ src, title, onClose }) => {
+            if (!src) return null;
+            return (
+                <div className="fixed inset-0 z-[100] bg-[#0f172a]/95 flex items-center justify-center p-4 backdrop-blur-md cursor-zoom-out animate-zoom" onClick={onClose}>
+                    <button className="absolute top-6 right-6 text-white bg-red-600 hover:bg-red-700 rounded-full p-2 transition-transform hover:scale-110 z-50">
+                        <Icons.X size={24}/>
+                    </button>
+                    <img src={src} alt={title} className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl" onClick={(e) => e.stopPropagation()} />
+                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white bg-[#0f172a]/50 px-4 py-2 rounded-full backdrop-blur-sm text-sm border border-gray-700 font-mono">
+                        {title}
+                    </div>
+                </div>
+            );
+        };
+
+        const CertificateCard = ({ cert, theme, onImageClick }) => {
+            const [imgError, setImgError] = useState(false);
+
+            return (
+                <div className={`group relative overflow-hidden flex flex-col reveal hover-trigger ${theme === 'light' ? 'bg-white rounded-xl shadow-sm hover:shadow-2xl border border-slate-100' : 'bg-[#0f172a] border border-slate-800'} transition-all duration-500 hover:-translate-y-2`}>
+                    
+                    {/* Priority Badge */}
+                    {cert.priority > 80 && (
+                        <div className="absolute top-2 right-2 z-20">
+                            <span className="bg-yellow-500 text-black text-[9px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                                <Icons.Star size={10} fill="black" /> ELITE
+                            </span>
+                        </div>
+                    )}
+
+                    <div 
+                        className={`h-48 w-full overflow-hidden relative flex justify-center items-center cursor-zoom-in ${theme === 'light' ? 'bg-slate-50' : 'bg-slate-900'}`}
+                        onClick={() => onImageClick(cert.imageLink, cert.title)}
+                    >
+                        {cert.imageLink && !imgError ? (
+                            <img src={cert.imageLink} alt={cert.title} onError={() => setImgError(true)} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" />
+                        ) : (
+                            <div className={`flex flex-col items-center justify-center text-center p-4 ${theme === 'light' ? 'text-slate-400' : 'text-slate-400'}`}>
+                                <Icons.Image size={32} className="mb-2 opacity-50" />
+                                <span className="text-[10px] font-mono tracking-wider uppercase">No Visual</span>
+                            </div>
+                        )}
+                        <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center ${theme === 'light' ? 'bg-[#0f172a]/20' : 'bg-blue-500/10'}`}>
+                            <span className="px-3 py-1 bg-[#0f172a]/70 text-white text-xs rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity delay-100">View Certificate</span>
+                        </div>
+                    </div>
+                    <div className="p-6 flex-1 flex flex-col relative z-10">
+                        <div className="flex-1">
+                            <h3 className={`text-lg font-bold mb-1 leading-tight ${theme === 'light' ? 'text-slate-800' : 'text-white font-heading'}`}>{cert.title}</h3>
+                            <p className="text-xs font-semibold text-blue-500 mb-2">{cert.issuer}</p>
+                            
+                            {/* Cert Tags */}
+                            {cert.tags && cert.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-3">
+                                    {cert.tags.map((t, i) => (
+                                        <span key={i} className={`text-[9px] px-2 py-0.5 rounded border opacity-70 ${theme === 'light' ? 'bg-slate-100 border-slate-200' : 'bg-slate-900/30 border-slate-700 text-cyan-300'}`}>
+                                            {t}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        {cert.link && cert.link.trim() !== "" && (
+                            <a href={cert.link} target="_blank" className={`mt-4 inline-flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-lg transition-all w-fit hover-trigger ${theme === 'light' ? 'bg-slate-900 text-white hover:bg-blue-600' : 'border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-black'}`}>
+                                <Icons.Link size={14}/> Verify
+                            </a>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const GroqChatbot = ({ apiKey, model, isOpen, setIsOpen, theme }) => {
+            const [messages, setMessages] = useState([
+                { role: 'system', content: 'You are the digital assistant of Mitanshu Bhasin. You are helpful, professional but can be witty.' },
+                { role: 'assistant', content: 'System Online. How can I assist?' }
+            ]);
+            const [input, setInput] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const chatEndRef = useRef(null);
+            useEffect(() => { chatEndRef.current && chatEndRef.current.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+            const sendMessage = async (e) => {
+                e.preventDefault();
+                if (!input.trim()) return;
+                const userMsg = { role: 'user', content: input };
+                setMessages(prev => [...prev, userMsg]);
+                setInput('');
+                if (!apiKey) { setMessages(prev => [...prev, { role: 'assistant', content: '⚠️ Missing API Key.' }]); return; }
+                setIsLoading(true);
+                try {
+                    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                        method: "POST", headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+                        body: JSON.stringify({ messages: [...messages, userMsg].filter(m => m.role !== 'system'), model: model || "llama3-8b-8192" })
+                    });
+                    const data = await response.json();
+                    if(data.error) throw new Error(data.error.message);
+                    setMessages(prev => [...prev, data.choices[0].message]);
+                } catch (error) { setMessages(prev => [...prev, { role: 'assistant', content: `Error: ${error.message}` }]); } 
+                finally { setIsLoading(false); }
+            };
+            return (
+                <>
+                    <button 
+                        onClick={() => setIsOpen(!isOpen)} 
+                        className={`fixed bottom-6 left-6 z-50 group flex flex-col items-center gap-2 transition-transform hover:scale-105`}
+                    >
+                        <div className={`relative p-4 rounded-full shadow-2xl transition-all duration-500 ${theme === 'light' ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-blue-500/40 hover:shadow-blue-600/60 ring-2 ring-white/50' : 'bg-[#0f172a] text-blue-400 border border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_40px_rgba(59,130,246,0.6)]'}`}>
+                            <Icons.Bot size={32} className="relative z-10" />
+                            
+                            {/* Animated Rings (Pulse Effect) */}
+                            <div className={`absolute inset-0 rounded-full animate-ping opacity-20 ${theme === 'light' ? 'bg-blue-400' : 'bg-blue-500'}`}></div>
+                            <div className={`absolute -inset-1 rounded-full animate-pulse opacity-40 blur-sm ${theme === 'light' ? 'bg-indigo-400' : 'bg-blue-600'}`}></div>
+                        </div>
+                        
+                        {/* Label Badge */}
+                        <div className={`px-3 py-1 rounded-full text-[9px] font-extrabold tracking-[0.2em] uppercase backdrop-blur-xl border transition-colors ${theme === 'light' ? 'bg-white/90 text-blue-900 border-blue-200 shadow-sm' : 'bg-[#0f172a]/80 text-blue-400 border-slate-700 shadow-lg'}`}>
+                            AI_CORE
+                        </div>
+                    </button>
+
+                    {isOpen && (
+                        <div className={`fixed bottom-40 left-6 z-50 w-80 md:w-96 rounded-lg overflow-hidden flex flex-col h-96 shadow-2xl glass-panel animate-float ${theme === 'light' ? 'border-gray-200' : 'border-blue-500'}`}>
+                            <div className={`p-3 border-b flex justify-between items-center ${theme === 'light' ? 'bg-gray-100/50 text-gray-800' : 'bg-slate-900/20 text-blue-500 font-cyber'}`}>
+                                <span className="text-sm font-bold flex items-center gap-2">ARCHITECT_AI</span>
+                                <button onClick={() => setIsOpen(false)}><Icons.X size={16}/></button>
+                            </div>
+                            <div className="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
+                                {messages.slice(1).map((m, i) => (
+                                    <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`max-w-[85%] p-3 rounded-lg ${m.role === 'user' ? (theme === 'light' ? 'bg-blue-600 text-white' : 'bg-slate-900 text-white') : (theme === 'light' ? 'bg-white shadow-sm text-gray-800' : 'bg-[#0f172a]/50 text-blue-400 border border-slate-800')}`}>{m.content}</div>
+                                    </div>
+                                ))}
+                                {isLoading && <div className="text-xs opacity-50 px-2 animate-pulse">Computing...</div>}
+                                <div ref={chatEndRef} />
+                            </div>
+                            <form onSubmit={sendMessage} className={`p-3 border-t flex gap-2 ${theme === 'light' ? 'bg-white/50' : 'bg-[#0f172a]/50 border-slate-800'}`}>
+                                <input value={input} onChange={e => setInput(e.target.value)} placeholder="Command..." className={`flex-1 p-2 text-xs outline-none rounded border ${theme === 'light' ? 'bg-white border-gray-200 text-black' : 'bg-[#0f172a] border-slate-800 text-white'}`} />
+                                <button type="submit" className={theme === 'light' ? 'text-blue-600' : 'text-blue-500'}><Icons.Terminal size={16}/></button>
+                            </form>
+                        </div>
+                    )}
+                </>
+            );
+        };
+
+        // --- NEW BIOGRAPHY SECTION ---
+        const BiographySection = ({ theme }) => {
+            return (
+                <section id="biography" className={`py-24 ${theme === 'light' ? 'bg-white' : 'bg-[#0f172a]/80'}`}>
+                    <div className="container mx-auto px-4">
+                         <a href="story.html" target="_blank" className={`block group relative rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 reveal ${theme === 'light' ? 'bg-white shadow-2xl border border-slate-100' : 'bg-slate-900 border border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_40px_rgba(59,130,246,0.4)]'}`}>
+                            <div className="grid md:grid-cols-2">
+                                {/* Image */}
+                                <div className="relative h-64 md:h-auto overflow-hidden">
+                                     <div className={`absolute inset-0 z-10 ${theme === 'light' ? 'bg-gradient-to-t from-white/20' : 'bg-gradient-to-t from-black/80'} via-transparent`}></div>
+                                     <img src="mitanshu.jpg" className="w-full h-full object-cover object-top transition-transform duration-1000 group-hover:scale-110 grayscale group-hover:grayscale-0" alt="Origins" />
+                                </div>
+                                {/* Content */}
+                                <div className="p-8 md:p-12 flex flex-col justify-center">
+                                    {/* Badge */}
+                                    <span className={`inline-block px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase rounded border w-fit mb-4 ${theme === 'light' ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-slate-900/30 text-blue-400 border-blue-500 animate-pulse'}`}>Origins</span>
+                                    
+                                    {/* Heading */}
+                                     <h2 className={`text-3xl md:text-4xl lg:text-5xl font-black mb-4 leading-tight ${theme === 'light' ? 'text-slate-900' : 'text-white font-heading glitch-text'}`} data-text="THE UNTOLD STORY">THE UNTOLD STORY</h2>
+                                     
+                                     {/* Desc */}
+                                     <p className={`text-lg mb-8 leading-relaxed ${theme === 'light' ? 'text-slate-600' : 'text-slate-400 font-mono'}`}>From facing attacks to building digital empires. Explore the real Mitanshu Bhasin beyond the certifications.</p>
+                                     
+                                     {/* Button */}
+                                     <div className={`inline-flex items-center gap-2 font-bold tracking-widest text-sm uppercase ${theme === 'light' ? 'text-blue-600 group-hover:gap-4 transition-all' : 'text-blue-400 group-hover:text-cyan-300'}`}>
+                                        READ ARTICLE <Icons.ArrowUp className="rotate-45" size={16}/>
+                                     </div>
+                                </div>
+                            </div>
+                         </a>
+                    </div>
+                </section>
+            )
+        }
+
+        // --- MAIN APP ---
+        const App = () => {
+            const [loading, setLoading] = useState(true);
+            const [theme, setTheme] = useState('light');
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const [user, setUser] = useState(null);
+            const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
+            const [adminTab, setAdminTab] = useState('config');
+            const [isChatOpen, setIsChatOpen] = useState(false);
+            const [showAllProjects, setShowAllProjects] = useState(false); // State for View All
+            
+            const [certifications, setCertifications] = useState([]);
+            const [projects, setProjects] = useState([]);
+            const [messages, setMessages] = useState([]);
+            
+            // Config States
+            const [heroConfig, setHeroConfig] = useState({ headline: 'Mitanshu Bhasin', subtext: 'System Architect & Full Stack Developer.', status: 'ONLINE' });
+            const [siteConfig, setSiteConfig] = useState({ phone: '', email: '', instagram: '', linkedin: '', groqApiKey: '', groqModel: '', avatarUrl: '' });
+            const [announcement, setAnnouncement] = useState({ text: '', active: false });
+            
+            const [contactForm, setContactForm] = useState({ name: '', phone: '', inquiryType: 'Project', message: '' });
+            const [contactStatus, setContactStatus] = useState('idle');
+
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+            // Updated New Cert State
+            const [newCert, setNewCert] = useState({ title: '', issuer: '', link: '', imageLink: '', priority: 0, tags: '' });
+            const [newProject, setNewProject] = useState({ title: '', desc: '', tags: '', link: '', priority: 0, isComplex: false, isMedium: false, isTool: false });
+            
+            const [editingProject, setEditingProject] = useState(null);
+            const [editingCert, setEditingCert] = useState(null);
+
+            // Modal States (Hoisted for Z-Index Fix)
+            const [selectedImage, setSelectedImage] = useState(null);
+            const [selectedProject, setSelectedProject] = useState(null);
+
+            // SPEED OPTIMIZATION: Reduced Timeout
+            useEffect(() => { setTimeout(() => setLoading(false), 800); }, []);
+
+            useEffect(() => {
+                if(loading) return;
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+                }, { threshold: 0.1 });
+                setTimeout(() => document.querySelectorAll('.reveal').forEach(el => observer.observe(el)), 100);
+                return () => observer.disconnect();
+            }, [theme, projects, certifications, loading, showAllProjects]);
+
+            useEffect(() => {
+                document.body.className = `theme-${theme}`;
+                const unsubAuth = auth.onAuthStateChanged(setUser);
+                
+                // Realtime Listeners
+                const unsubHero = db.collection('site_config').doc('hero').onSnapshot(d => d.exists && setHeroConfig(d.data()));
+                const unsubMain = db.collection('site_config').doc('main').onSnapshot(d => d.exists && setSiteConfig(prev => ({...prev, ...d.data()})));
+                const unsubAnnounce = db.collection('site_config').doc('announcement').onSnapshot(d => d.exists && setAnnouncement(d.data()));
+                
+                const unsubCerts = db.collection('certifications').orderBy('createdAt', 'desc').onSnapshot(s => setCertifications(s.docs.map(d => ({id: d.id, ...d.data()}))));
+                const unsubProjs = db.collection('projects').orderBy('createdAt', 'desc').onSnapshot(s => setProjects(s.docs.map(d => ({id: d.id, ...d.data()}))));
+                
+                return () => { unsubAuth(); unsubHero(); unsubMain(); unsubAnnounce(); unsubCerts(); unsubProjs(); };
+            }, [theme]);
+
+            useEffect(() => { if(user) return db.collection('messages').orderBy('timestamp', 'desc').onSnapshot(s => setMessages(s.docs.map(d => ({id: d.id, ...d.data()})))); }, [user]);
+
+            const toggleTheme = () => setTheme(prev => prev === 'light' ? 'cyber' : 'light');
+            const handleLogin = async (e) => { e.preventDefault(); try { await auth.signInWithEmailAndPassword(email, password); setIsAdminPanelOpen(false); } catch(e) { alert(e.message); } };
+            const handleLogout = () => { auth.signOut(); setIsAdminPanelOpen(false); };
+            
+            // Cert Logic with Priority & Tags
+            const saveCert = async (e) => { 
+                e.preventDefault(); 
+                const tagsArray = typeof newCert.tags === 'string' ? newCert.tags.split(',').map(t => t.trim()).filter(Boolean) : newCert.tags;
+                const certData = { 
+                    ...newCert, 
+                    tags: tagsArray,
+                    priority: parseInt(newCert.priority) || 0 
+                };
+
+                if(editingCert) {
+                    await db.collection('certifications').doc(editingCert).update(certData);
+                } else {
+                    await db.collection('certifications').add({ ...certData, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); 
+                }
+                setNewCert({ title: '', issuer: '', link: '', imageLink: '', priority: 0, tags: '' }); 
+                setEditingCert(null); 
+            };
+            
+            const startEditCert = (cert) => { 
+                setNewCert({ 
+                    title: cert.title, 
+                    issuer: cert.issuer, 
+                    link: cert.link || '', 
+                    imageLink: cert.imageLink || '',
+                    priority: cert.priority || 0,
+                    tags: cert.tags ? cert.tags.join(', ') : ''
+                }); 
+                setEditingCert(cert.id); 
+            };
+
+            const deleteDoc = (coll, id) => { if(confirm("Delete?")) db.collection(coll).doc(id).delete(); };
+            
+            // Project Logic
+            const saveProject = async (e) => { 
+                e.preventDefault(); 
+                const tags = typeof newProject.tags === 'string' ? newProject.tags.split(',').map(t => t.trim()) : newProject.tags; 
+                const projectData = { 
+                    ...newProject, 
+                    tags, 
+                    priority: parseInt(newProject.priority) || 0,
+                    isComplex: newProject.isComplex || false,
+                    isMedium: newProject.isMedium || false,
+                    isTool: newProject.isTool || false
+                };
+
+                if (editingProject) {
+                    await db.collection('projects').doc(editingProject).update(projectData);
+                } else {
+                    await db.collection('projects').add({ ...projectData, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); 
+                }
+                setNewProject({ title: '', desc: '', tags: '', link: '', priority: 0, isComplex: false, isMedium: false, isTool: false }); 
+                setEditingProject(null); 
+            };
+
+            const startEditProject = (proj) => { 
+                setNewProject({ 
+                    title: proj.title, 
+                    desc: proj.desc, 
+                    link: proj.link || '', 
+                    tags: proj.tags ? proj.tags.join(', ') : '',
+                    priority: proj.priority || 0,
+                    isComplex: proj.isComplex || false,
+                    isMedium: proj.isMedium || false,
+                    isTool: proj.isTool || false
+                }); 
+                setEditingProject(proj.id); 
+            };
+            
+            const sendMsg = async (e) => { e.preventDefault(); setContactStatus('sending'); try { await db.collection('messages').add({ ...contactForm, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); setContactStatus('sent'); setContactForm({ name: '', phone: '', inquiryType: 'Project', message: '' }); setTimeout(() => setContactStatus('idle'), 3000); } catch (e) { alert(e.message); setContactStatus('error'); } };
+            const scrollTo = (id) => document.getElementById(id) && document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+
+            // Sort Projects
+            const sortedProjects = [...projects].sort((a, b) => {
+                const pA = a.priority || 0;
+                const pB = b.priority || 0;
+                if (pA !== pB) return pB - pA;
+                return 0; 
+            });
+            const displayedProjects = showAllProjects ? sortedProjects : sortedProjects.slice(0, 6);
+
+            // Sort Certs by Priority
+            const sortedCerts = [...certifications].sort((a, b) => (b.priority || 0) - (a.priority || 0));
+
+            const skills = [{ name: "Full Stack Dev", level: "98%" }, { name: "Python & Scripting", level: "95%" }, { name: "Ethical Hacking", level: "90%" }, { name: "Linux & Servers", level: "92%" }, { name: "System Architecture", level: "95%" }];
+            const servicesList = [{ title: 'Web Development', desc: 'Building blazing fast, SEO-optimized websites using React & modern tech.', icon: <Icons.Globe size={32}/> }, { title: 'App Development', desc: 'Cross-platform mobile apps that offer seamless user experiences.', icon: <Icons.Phone size={32}/> }, { title: 'Ethical Hacking', desc: 'Securing your digital assets by finding vulnerabilities before hackers do.', icon: <Icons.Shield size={32}/> }, { title: 'Server Management', desc: 'Linux based server setup, maintenance, and security hardening.', icon: <Icons.Server size={32}/> }, { title: 'Python Automation', desc: 'Automating boring tasks and building complex backend logic with Python.', icon: <Icons.Cpu size={32}/> }, { title: 'Consultation', desc: 'Expert advice on system architecture and tech stack selection.', icon: <Icons.Bot size={32}/> }];
+
+            if (loading) return (
+                <>
+                    {theme === 'cyber' ? <MatrixRain color="#00ff41" /> : <NeuralNetwork />}
+                    <div id="preloader">
+                        <div className="text-xl md:text-3xl font-bold tracking-widest mb-6 font-heading glitch-text" data-text="MITANSHU BHASIN">MITANSHU BHASIN</div>
+                        <div className="w-64 h-1 bg-slate-800 rounded overflow-hidden mb-2">
+                            <div className="h-full bg-blue-500 animate-[width_0.8s_ease-out] w-full origin-left"></div>
+                        </div>
+                        <div className="text-[10px] md:text-xs opacity-70 font-mono space-y-1 text-center">
+                            <span className="block">{'>'}  SYSTEM BOOT... FAST MODE</span>
+                        </div>
+                    </div>
+                </>
+            );
+
+            return (
+                <div className="min-h-screen relative overflow-x-hidden selection:bg-blue-500 selection:text-white">
+                    <ScrollProgress />
+                    {theme === 'cyber' ? <MatrixRain color="#00ff41" /> : <NeuralNetwork />}
+                    <div className="scanlines"></div>
+
+                    {/* ANNOUNCEMENT BAR */}
+                    <AnnouncementBar config={announcement} />
+
+                    {/* NAV */}
+                    <nav className={`fixed top-0 w-full z-40 transition-all duration-300 ${theme === 'light' ? 'bg-white/70 border-b border-white/50' : 'bg-[#0f172a]/80 border-b border-slate-800/50'} backdrop-blur-md`}>
+                        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+                            <div className={`text-xl md:text-2xl font-bold tracking-wider cursor-pointer flex items-center gap-3 hover-trigger ${theme === 'cyber' ? 'font-heading glitch-text text-blue-500' : 'text-slate-900 font-sans'}`} data-text="MITANSHU" onClick={() => scrollTo('home')}>
+                                {siteConfig.avatarUrl ? (
+                                    <img src={siteConfig.avatarUrl} alt="Avatar" className="w-10 h-10 rounded-full object-cover border-2 border-current shadow-lg hover:rotate-12 transition-transform" />
+                                ) : (
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 border-current ${theme === 'light' ? 'bg-slate-200' : 'bg-slate-800'}`}><Icons.User size={20} /></div>
+                                )}
+                                <span className="hidden md:block"><TextScramble text="MITANSHU" /></span>
+                            </div>
+                            <div className="hidden md:flex gap-8 items-center text-sm font-medium">
+                                {['About', 'Services', 'Projects', 'Certifications', 'Contact'].map(item => (
+                                    <button key={item} onClick={() => scrollTo(item.toLowerCase())} className={`transition-all hover:scale-105 hover-trigger uppercase tracking-wide text-xs font-bold ${theme === 'light' ? 'text-slate-600 hover:text-blue-600' : 'text-slate-400 hover:text-blue-500 hover:shadow-[0_0_10px_rgba(0,255,65,0.5)]'}`}>
+                                        {item}
+                                    </button>
+                                ))}
+                                <div className="w-px h-6 bg-gray-300/50 mx-2"></div>
+                                <button onClick={toggleTheme} className={`p-2 rounded-full transition-all hover:rotate-45 hover-trigger ${theme === 'light' ? 'bg-slate-100 text-slate-700' : 'bg-slate-900 text-yellow-400 border border-yellow-400'}`}>
+                                    {theme === 'light' ? <Icons.Moon size={18} /> : <Icons.Sun size={18} />}
+                                </button>
+                                {user && <button onClick={() => setIsAdminPanelOpen(true)} className="text-red-500 font-bold border border-red-500 px-3 py-1 text-[10px] rounded animate-pulse">ADMIN</button>}
+                            </div>
+                            <button className="md:hidden hover-trigger" onClick={() => setIsMenuOpen(!isMenuOpen)}><Icons.Menu /></button>
+                        </div>
+                        {isMenuOpen && (
+                            <div className={`md:hidden absolute w-full border-b p-4 flex flex-col gap-4 shadow-lg animate-float ${theme === 'light' ? 'bg-white border-gray-100' : 'bg-[#0f172a] border-slate-800'}`}>
+                                {['About', 'Services', 'Projects', 'Contact'].map(item => <button key={item} onClick={() => {scrollTo(item.toLowerCase()); setIsMenuOpen(false)}} className="text-left font-bold py-2">{item}</button>)}
+                                <div className="flex justify-between items-center border-t pt-4 border-gray-700">
+                                    <span>System Mode</span>
+                                    <button onClick={toggleTheme}>{theme === 'light' ? <Icons.Moon /> : <Icons.Sun />}</button>
+                                </div>
+                            </div>
+                        )}
+                    </nav>
+
+                    {/* HERO */}
+                    <section id="home" className="min-h-screen flex items-center justify-center pt-20 px-4 relative">
+                        <div className="container mx-auto grid md:grid-cols-2 gap-12 items-center z-10">
+                            <div className="space-y-6">
+                                <div className={`inline-block px-3 py-1 text-[10px] font-mono mb-2 rounded border reveal ${theme === 'light' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'border-blue-500 bg-[#0f172a]/50 text-blue-400'}`}>
+                                    SYSTEM_STATUS: <span className="animate-pulse">{heroConfig.status}</span>
+                                </div>
+                                <h1 className={`text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight reveal reveal-delay-1 ${theme === 'cyber' ? 'font-heading glitch-text text-white' : 'text-slate-900 font-sans tracking-tight'}`} data-text={heroConfig.headline}>
+                                    <TextScramble text={heroConfig.headline} />
+                                </h1>
+                                <p className={`text-lg md:text-xl max-w-lg reveal reveal-delay-2 ${theme === 'light' ? 'text-slate-600 font-light' : 'text-slate-400 font-mono'}`}>
+                                    {heroConfig.subtext}
+                                </p>
+                                <div className="flex gap-4 pt-4 reveal reveal-delay-3">
+                                    <button onClick={() => scrollTo('contact')} className={`font-bold py-3 px-8 transition-all hover:scale-105 hover-trigger ${theme === 'light' ? 'bg-slate-900 text-white hover:bg-slate-800 rounded-full shadow-lg hover:shadow-xl' : 'bg-blue-600 text-black hover:bg-blue-500 border border-blue-400 rounded-none'}`}>
+                                        Start Project
+                                    </button>
+                                    <button onClick={() => scrollTo('projects')} className={`font-bold py-3 px-8 transition-all hover:scale-105 hover-trigger ${theme === 'light' ? 'bg-white text-slate-900 border border-slate-200 hover:border-slate-400 rounded-full' : 'bg-transparent text-blue-500 border border-blue-500 hover:bg-slate-900/20 rounded-none'}`}>
+                                        View Work
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {/* 3D TILT CARD (Optimized for Mobile) */}
+                            <div className="perspective-1000 reveal reveal-delay-2">
+                                <TiltCard className={`rounded-2xl p-8 shadow-2xl transition-all ${theme === 'light' ? 'bg-white/80 border border-gray-100 shadow-xl shadow-blue-500/10 backdrop-blur-xl' : 'bg-slate-900/80 border border-slate-700 backdrop-blur-md shadow-[0_0_30px_rgba(0,255,65,0.1)]'}`}>
+                                    <div className="flex gap-2 mb-6 border-b border-gray-700/20 pb-4">
+                                        <div className="w-3 h-3 rounded-full bg-red-400 hover:bg-red-500 transition-colors"></div>
+                                        <div className="w-3 h-3 rounded-full bg-amber-400 hover:bg-amber-500 transition-colors"></div>
+                                        <div className="w-3 h-3 rounded-full bg-emerald-400 hover:bg-emerald-500 transition-colors"></div>
+                                    </div>
+                                    <div className={`font-mono text-sm space-y-3 ${theme === 'light' ? 'text-slate-600' : 'text-blue-400'}`}>
+                                        <p><span className="text-purple-500">class</span> <span className="text-amber-600">Architect</span> <span className="text-purple-500">extends</span> <span className="text-amber-600">Developer</span> {'{'}</p>
+                                        <p className="pl-4">constructor() {'{'}</p>
+                                        <p className="pl-8">this.name = <span className="text-emerald-600">"Mitanshu"</span>;</p>
+                                        <p className="pl-8">this.vision = <span className="text-emerald-600">"Infinite Scalability"</span>;</p>
+                                        <p className="pl-8">this.stack = [<span className="text-emerald-600">"MERN"</span>, <span className="text-emerald-600">"Firebase"</span>, <span className="text-emerald-600">"Python"</span>];</p>
+                                        <p className="pl-4">{'}'}</p>
+                                        <p className="pl-4">buildFuture() {'{'}</p>
+                                        <p className="pl-8 text-blue-500 font-bold">// TODO: Change the world</p>
+                                        <p className="pl-8">return <span className="text-purple-500">new</span> Legacy();</p>
+                                        <p className="pl-4">{'}'}</p>
+                                        <p>{'}'}</p>
+                                        <p className="animate-pulse">_</p>
+                                    </div>
+                                </TiltCard>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* ABOUT */}
+                    <section id="about" className="py-24">
+                        <div className="container mx-auto px-4 grid md:grid-cols-2 gap-16 items-center">
+                            <div className="reveal">
+                                <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${theme === 'cyber' ? 'font-heading border-l-4 border-purple-500 pl-4' : 'text-slate-900'}`}>The Architect's Mind</h2>
+                                <div className={`leading-relaxed mb-6 space-y-4 text-lg ${theme === 'light' ? 'text-slate-600' : 'text-slate-400 font-mono'}`}>
+                                    <p>I don't just write code; I design <strong className={theme==='light'?'text-blue-600':'text-blue-400'}>digital ecosystems</strong>. At 16, balancing JEE advanced physics with enterprise-level system architecture has taught me one thing: <strong>Efficiency is King.</strong></p>
+                                    <p>My stack is built for speed and security. Whether it's securing a Linux server or deploying a serverless React app on Firebase, I bring military-grade discipline to software engineering.</p>
+                                </div>
+                                <div className="mt-8 space-y-5">
+                                    {skills.map((s, idx) => (
+                                        <div key={s.name} className={`reveal reveal-delay-${(idx%3)+1}`}>
+                                            <div className="flex justify-between text-xs font-bold mb-1 opacity-80"><span>{s.name}</span><span>{s.level}</span></div>
+                                            <div className={`h-2 w-full rounded-full overflow-hidden ${theme === 'light' ? 'bg-slate-200' : 'bg-slate-800'}`}>
+                                                <div className={`h-full rounded-full skill-bar-fill ${theme === 'light' ? 'bg-gradient-to-r from-blue-600 to-purple-600' : 'bg-blue-500 shadow-[0_0_10px_#3b82f6]'}`} style={{'--target-width': s.level}}></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className={`p-8 rounded-2xl reveal reveal-delay-2 ${theme === 'light' ? 'bg-white shadow-xl border border-slate-100' : 'bg-[#0f172a]/50 border border-slate-800 font-mono shadow-[0_0_20px_rgba(0,255,0,0.1)]'}`}>
+                                <h3 className="font-bold mb-6 pb-2 border-b border-gray-700/20 text-xl">System Specs</h3>
+                                <ul className="space-y-6 text-sm">
+                                    <li className="flex justify-between items-center group"><span className="opacity-70 group-hover:text-blue-500 transition-colors">Location</span> <span className="font-bold">Delhi, India</span></li>
+                                    <li className="flex justify-between items-center group"><span className="opacity-70 group-hover:text-blue-500 transition-colors">Role</span> <span className="font-bold">System Architect</span></li>
+                                    <li className="flex justify-between items-center group"><span className="opacity-70 group-hover:text-blue-500 transition-colors">Education</span> <span className="font-bold">Class 11 (JEE - PCM+CS)</span></li>
+                                    
+                                    {/* CORE STACK FIXED */}
+                                    <li className="flex justify-between items-center group">
+                                        <span className="opacity-70 group-hover:text-blue-500 transition-colors">Core Stack</span> 
+                                        <span className={`font-bold text-xs px-2 py-1 rounded transition-colors ${theme === 'light' ? 'bg-slate-100 text-slate-800' : 'bg-slate-900 text-cyan-300'}`}>
+                                            React, Node, Firebase
+                                        </span>
+                                    </li>
+                                    
+                                    <li className="flex justify-between items-center group"><span className="opacity-70 group-hover:text-blue-500 transition-colors">Status</span> <span className={`inline-block px-2 py-1 rounded-full text-[10px] font-bold ${theme === 'light' ? 'bg-green-100 text-slate-400' : 'bg-slate-900 text-blue-400 animate-pulse'}`}>OPEN FOR WORK</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* SERVICES */}
+                    <section id="services" className={`py-24 ${theme === 'light' ? 'bg-slate-50' : ''}`}>
+                        <div className="container mx-auto px-4">
+                            <h2 className={`text-3xl md:text-4xl font-bold mb-16 text-center reveal ${theme === 'cyber' ? 'font-heading text-white' : 'text-slate-900'}`}>Services Deployed</h2>
+                            <div className="grid md:grid-cols-3 gap-8">
+                                {servicesList.map((svc, i) => (
+                                    <div key={i} className={`p-8 transition-all duration-300 hover:-translate-y-3 group flex flex-col items-center text-center reveal reveal-delay-${(i%3)+1} hover-trigger ${theme === 'light' ? 'bg-white rounded-2xl shadow-sm hover:shadow-2xl border border-slate-100' : 'bg-slate-900/40 border border-slate-800 hover:border-blue-500'}`}>
+                                        <div className={`mb-6 p-4 rounded-2xl inline-block transition-transform group-hover:scale-110 group-hover:rotate-3 ${theme === 'light' ? 'bg-blue-50 text-blue-600' : 'bg-slate-900/20 text-blue-500'}`}>
+                                            {svc.icon}
+                                        </div>
+                                        <h3 className={`text-xl font-bold mb-3 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>{svc.title}</h3>
+                                        <p className="text-sm opacity-70 leading-relaxed">{svc.desc}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* PROJECTS */}
+                    <section id="projects" className="py-24">
+                        <div className="container mx-auto px-4">
+                            <h2 className={`text-3xl md:text-4xl font-bold mb-16 text-center reveal ${theme === 'cyber' ? 'font-heading text-white' : 'text-slate-900'}`}>Featured Deployments</h2>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {displayedProjects.map((proj, idx) => (
+                                    <div onClick={() => setSelectedProject(proj)} key={proj.id} className={`cursor-pointer flex flex-col h-full transition-all duration-500 hover:-translate-y-2 group reveal reveal-delay-${(idx%3)+1} hover-trigger relative overflow-hidden ${theme === 'light' ? 'bg-white rounded-2xl shadow-md hover:shadow-2xl border border-slate-100' : 'bg-slate-900/30 border border-gray-800 hover:border-blue-500'}`}>
+                                        
+                                        {/* FEATURE RICH BADGES (Max 2 Logic) */}
+                                        <div className="absolute top-0 right-0 z-10 flex flex-col items-end gap-1 p-2">
+                                            {/* Logic to limit badges to 2 */}
+                                            {(() => {
+                                                const badges = [];
+                                                if (proj.isComplex) badges.push(
+                                                    <div key="complex" className={`text-[10px] font-bold px-3 py-1 rounded shadow-sm flex items-center gap-1 backdrop-blur-md ${theme === 'light' ? 'bg-yellow-400 text-black' : 'bg-yellow-600/90 text-white border border-yellow-400'}`}>
+                                                        <Icons.Star size={12} fill="currentColor" /> FLAGSHIP
+                                                    </div>
+                                                );
+                                                if (proj.isMedium) badges.push(
+                                                    <div key="medium" className={`text-[10px] font-bold px-3 py-1 rounded shadow-sm flex items-center gap-1 backdrop-blur-md ${theme === 'light' ? 'bg-blue-500 text-white' : 'bg-blue-600/90 text-white border border-blue-400'}`}>
+                                                        <Icons.Zap size={12} fill="currentColor" /> CORE
+                                                    </div>
+                                                );
+                                                if (proj.isTool) badges.push(
+                                                    <div key="tool" className={`text-[10px] font-bold px-3 py-1 rounded shadow-sm flex items-center gap-1 backdrop-blur-md ${theme === 'light' ? 'bg-blue-500 text-white' : 'bg-blue-600/90 text-white border border-blue-400'}`}>
+                                                        <Icons.Wrench size={12} fill="currentColor" /> UTILITY
+                                                    </div>
+                                                );
+                                                return badges.slice(0, 2);
+                                            })()}
+                                        </div>
+
+                                        <div className="p-8 flex-1 mt-4">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <h3 className={`text-xl font-bold group-hover:text-blue-600 transition-colors ${theme === 'light' ? 'text-slate-800' : 'text-white font-heading group-hover:text-blue-400'}`}>{proj.title}</h3>
+                                            </div>
+                                            
+                                            {/* Feature Rich Tech Stack Display */}
+                                            <div className="flex flex-wrap gap-2 mb-6">
+                                                {proj.tags && proj.tags.map((t,i) => (
+                                                    <span key={i} className={`text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider border ${theme === 'light' ? 'bg-slate-50 text-slate-600 border-slate-200' : 'bg-[#0f172a] text-blue-400 border-slate-800 group-hover:border-blue-500/50'}`}>{t}</span>
+                                                ))}
+                                            </div>
+
+                                            <p className={`text-sm mb-4 line-clamp-3 leading-relaxed ${theme === 'light' ? 'text-slate-600' : 'text-slate-400'}`}>{proj.desc}</p>
+                                        </div>
+                                        
+                                        {/* Enhanced Action Area */}
+                                        <div className={`flex justify-between items-center px-8 py-4 text-xs font-bold tracking-wider transition-colors hover-trigger ${theme === 'light' ? 'bg-slate-50 border-t border-slate-100 text-slate-500 group-hover:bg-slate-100 group-hover:text-blue-600' : 'bg-slate-900/10 border-t border-gray-800 text-gray-500 group-hover:bg-slate-900/30 group-hover:text-blue-400'}`}>
+                                            <span>ACCESS TERMINAL</span>
+                                            <span className="transform group-hover:translate-x-1 transition-transform">&rarr;</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            {/* VIEW ALL TOGGLE BUTTON */}
+                            {projects.length > 6 && (
+                                <div className="mt-12 text-center reveal">
+                                    <button 
+                                        onClick={() => setShowAllProjects(!showAllProjects)} 
+                                        className={`px-8 py-3 rounded-full font-bold text-sm tracking-widest uppercase transition-all hover:scale-105 shadow-lg ${theme === 'light' ? 'bg-slate-900 text-white hover:bg-slate-700' : 'bg-slate-900/20 border border-blue-500 text-blue-500 hover:bg-slate-900/50'}`}
+                                    >
+                                        {showAllProjects ? "Collapse List" : "View All Deployments"}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </section>
+
+                    {/* CERTIFICATIONS */}
+                    <section id="certifications" className={`py-24 ${theme === 'light' ? 'bg-slate-50' : ''}`}>
+                        <div className="container mx-auto px-4">
+                            <h2 className={`text-3xl md:text-4xl font-bold mb-16 text-center reveal ${theme === 'cyber' ? 'font-heading text-white' : 'text-slate-900'}`}>Credentials</h2>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {sortedCerts.map(cert => (
+                                    <CertificateCard 
+                                        key={cert.id} 
+                                        cert={cert} 
+                                        theme={theme} 
+                                        onImageClick={(src, title) => setSelectedImage({src, title})} 
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* BIOGRAPHY SECTION */}
+                    <BiographySection theme={theme} />
+
+                    {/* CONTACT */}
+                    <section id="contact" className={`py-24 relative overflow-hidden ${theme === 'light' ? 'bg-white' : 'bg-gradient-to-b from-black to-green-900/20'}`}>
+                        <div className="container mx-auto px-4 max-w-4xl text-center relative z-10">
+                            <h2 className={`text-3xl md:text-4xl font-bold mb-6 reveal ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>Establish Connection</h2>
+                            <p className="text-gray-500 mb-12 reveal reveal-delay-1">Have a project in mind? Let's build something that breaks the internet.</p>
+                            
+                            <div className={`p-8 md:p-12 text-left rounded-2xl shadow-2xl transition-all reveal reveal-delay-2 ${theme === 'light' ? 'bg-white border border-slate-100 shadow-xl' : 'bg-slate-900/80 border border-blue-500 backdrop-blur-md'}`}>
+                                {contactStatus === 'sent' ? (
+                                    <div className="text-center py-10 animate-float">
+                                        <div className="mb-4 inline-flex p-4 rounded-full bg-green-100 text-blue-600"><Icons.Bot size={40} /></div>
+                                        <h3 className="text-2xl font-bold text-blue-600 mb-2">Transmission Received!</h3>
+                                        <p className="text-gray-500">Stand by for response.</p>
+                                    </div>
+                                ) : (
+                                    <form onSubmit={sendMsg} className="space-y-6">
+                                        <div className="grid md:grid-cols-2 gap-6">
+                                            <div className="space-y-2 group">
+                                                <label className="text-xs font-bold uppercase tracking-wider opacity-70 group-focus-within:text-blue-500 transition-colors">Name / Alias</label>
+                                                <input required value={contactForm.name} onChange={e => setContactForm({...contactForm, name: e.target.value})} className={`w-full p-4 rounded-xl outline-none border transition-all hover-trigger ${theme === 'light' ? 'bg-slate-50 border-slate-200 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10' : 'bg-[#0f172a] border-slate-800 text-white focus:border-blue-500 focus:shadow-[0_0_15px_rgba(0,255,0,0.2)]'}`} />
+                                            </div>
+                                            <div className="space-y-2 group">
+                                                <label className="text-xs font-bold uppercase tracking-wider opacity-70 group-focus-within:text-blue-500 transition-colors">Comm Link (Phone/Email)</label>
+                                                <input required value={contactForm.phone} onChange={e => setContactForm({...contactForm, phone: e.target.value})} className={`w-full p-4 rounded-xl outline-none border transition-all hover-trigger ${theme === 'light' ? 'bg-slate-50 border-slate-200 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10' : 'bg-[#0f172a] border-slate-800 text-white focus:border-blue-500 focus:shadow-[0_0_15px_rgba(0,255,0,0.2)]'}`} />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2 group">
+                                            <label className="text-xs font-bold uppercase tracking-wider opacity-70 group-focus-within:text-blue-500 transition-colors">Protocol (Inquiry Type)</label>
+                                            <select 
+                                                value={contactForm.inquiryType} 
+                                                onChange={e => setContactForm({...contactForm, inquiryType: e.target.value})} 
+                                                className={`w-full p-4 rounded-xl outline-none border transition-all cursor-pointer hover-trigger ${theme === 'light' ? 'bg-slate-50 border-slate-200 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 text-slate-800' : 'bg-[#0f172a] border-slate-800 text-white focus:border-blue-500'}`}
+                                            >
+                                                <option value="Project">I want to build a Project (Project)</option>
+                                                <option value="Quote">I need a Quote (Price Estimate)</option>
+                                                <option value="Hiring">Hiring / Job Offer</option>
+                                                <option value="Collaboration">Collaboration / Partnership</option>
+                                                <option value="Other">Other Query</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2 group">
+                                            <label className="text-xs font-bold uppercase tracking-wider opacity-70 group-focus-within:text-blue-500 transition-colors">Payload (Message)</label>
+                                            <textarea required rows="4" value={contactForm.message} onChange={e => setContactForm({...contactForm, message: e.target.value})} className={`w-full p-4 rounded-xl outline-none border transition-all hover-trigger ${theme === 'light' ? 'bg-slate-50 border-slate-200 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10' : 'bg-[#0f172a] border-slate-800 text-white focus:border-blue-500 focus:shadow-[0_0_15px_rgba(0,255,0,0.2)]'}`} placeholder="Describe mission parameters..."></textarea>
+                                        </div>
+                                        <button type="submit" disabled={contactStatus === 'sending'} className={`w-full py-4 font-bold tracking-widest uppercase transition-all rounded-xl hover-trigger transform active:scale-95 ${theme === 'light' ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30' : 'bg-blue-600 hover:bg-blue-500 text-black border border-blue-400 hover:shadow-[0_0_20px_rgba(0,255,0,0.4)]'}`}>
+                                            {contactStatus === 'sending' ? 'Transmitting...' : 'Send Transmission'}
+                                        </button>
+                                    </form>
+                                )}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* FOOTER */}
+                    <footer className={`py-12 text-center text-xs transition-colors relative z-10 ${theme === 'light' ? 'bg-slate-100 text-slate-500 border-t border-slate-200' : 'bg-[#0f172a] border-t border-slate-800 text-green-700'}`}>
+                        <div className="container mx-auto px-4">
+                            <p className="font-semibold text-sm">&copy; {new Date().getFullYear()} Mitanshu Bhasin.</p>
+                            <p className="mt-2 opacity-60">System Architect // Full Stack Developer // Cyber Defender</p>
+                            
+                            <div className="mt-6 flex justify-center">
+                                <button onClick={() => setIsAdminPanelOpen(true)} className="opacity-20 hover:opacity-80 transition-opacity text-xs flex items-center gap-1 cursor-default hover-trigger">
+                                    <Icons.Lock size={12}/> Secure Access
+                                </button>
+                            </div>
+                        </div>
+                    </footer>
+                    
+                    {/* SOCIALS */}
+                    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-4">
+                         {siteConfig.phone && (
+                            <a href={`tel:${siteConfig.phone}`} className="p-4 bg-blue-600 text-white rounded-full shadow-lg shadow-blue-500/40 hover:scale-110 transition-transform flex items-center justify-center hover-trigger">
+                                <Icons.Phone size={20}/>
+                            </a>
+                         )}
+                         <a href="https://instagram.com/mitanshubhasin" target="_blank" className="p-4 text-white rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center hover-trigger" style={{background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)'}}>
+                             <Icons.Instagram size={20}/>
+                         </a>
+                         {siteConfig.linkedin && (
+                            <a href={siteConfig.linkedin} target="_blank" className="p-4 bg-blue-700 text-white rounded-full shadow-lg shadow-blue-700/40 hover:scale-110 transition-transform flex items-center justify-center hover-trigger">
+                                <Icons.Linkedin size={20}/>
+                            </a>
+                         )}
+                         {siteConfig.phone && (
+                            <a href={`https://wa.me/${siteConfig.phone.replace(/[^0-9]/g, '')}`} target="_blank" className="p-4 bg-blue-500 text-white rounded-full shadow-lg shadow-green-500/40 hover:scale-110 transition-transform flex items-center justify-center hover-trigger">
+                                <Icons.MessageCircle size={20}/>
+                            </a>
+                         )}
+                    </div>
+
+                    <BackToTop theme={theme} />
+                    <GroqChatbot apiKey={siteConfig.groqApiKey} model={siteConfig.groqModel} isOpen={isChatOpen} setIsOpen={setIsChatOpen} theme={theme} />
+
+                    {/* GLOBAL MODALS (Placed here to fix Z-Index Clipping) */}
+                    <ImageModal src={selectedImage && selectedImage.src} title={selectedImage && selectedImage.title} onClose={() => setSelectedImage(null)} />
+                    <ProjectModal project={selectedProject} theme={theme} onClose={() => setSelectedProject(null)} />
+
+                    {/* ADMIN PANEL (Retained Logic, Enhanced UI) */}
+                    {isAdminPanelOpen && (
+                        <div className="fixed inset-0 bg-[#0f172a]/95 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-float">
+                            <div className="bg-slate-900 w-full max-w-4xl h-[85vh] flex flex-col border border-red-900 shadow-[0_0_50px_rgba(255,0,0,0.2)] rounded-xl overflow-hidden">
+                                <div className="bg-red-900/20 p-4 border-b border-red-900 flex justify-between items-center">
+                                    <h2 className="text-red-500 font-bold tracking-widest flex items-center gap-2 text-lg"><Icons.Shield size={20}/> GOD_MODE_ENABLED</h2>
+                                    <div className="flex items-center gap-4">
+                                        {user && <button onClick={handleLogout} className="text-xs text-red-300 hover:text-white underline hover-trigger">TERMINATE SESSION</button>}
+                                        <button onClick={() => setIsAdminPanelOpen(false)} className="text-white hover:text-red-500 hover-trigger"><Icons.X /></button>
+                                    </div>
+                                </div>
+                                {!user ? (
+                                    <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-6">
+                                        <Icons.Lock size={64} className="text-red-900 opacity-50 mb-4" />
+                                        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Admin Identity" className="w-full max-w-sm bg-[#0f172a] border border-red-900 p-4 text-red-500 outline-none rounded-lg focus:border-red-500 transition-colors"/>
+                                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Passcode" className="w-full max-w-sm bg-[#0f172a] border border-red-900 p-4 text-red-500 outline-none rounded-lg focus:border-red-500 transition-colors"/>
+                                        <button onClick={handleLogin} className="w-full max-w-sm bg-red-900 text-white font-bold py-4 rounded-lg hover:bg-red-800 transition-colors hover-trigger">AUTHENTICATE</button>
+                                    </div>
+                                ) : (
+                                    <div className="flex-1 flex flex-col overflow-hidden">
+                                        <div className="flex border-b border-red-900 bg-[#0f172a]">
+                                            {['config', 'projects', 'certs', 'inbox'].map(t => (
+                                                <button key={t} onClick={() => setAdminTab(t)} className={`flex-1 py-4 uppercase text-xs font-bold transition-colors hover-trigger ${adminTab === t ? 'bg-red-900 text-white' : 'text-gray-500 hover:bg-slate-800'}`}>{t}</button>
+                                            ))}
+                                        </div>
+                                        <div className="flex-1 overflow-y-auto p-8 bg-slate-900 text-gray-300">
+                                            {/* (Admin Forms - Same logic, cleaner UI) */}
+                                            {adminTab === 'config' && (
+                                                <div className="space-y-6 max-w-2xl mx-auto">
+                                                    <div className="bg-[#0f172a]/50 p-4 border border-red-900/50 rounded-lg">
+                                                        <div className="text-xs uppercase font-bold text-red-400 mb-2">Global Broadcast (Top Bar)</div>
+                                                        <div className="flex gap-2 mb-2">
+                                                            <input value={announcement.text} onChange={e => setAnnouncement({...announcement, text: e.target.value})} placeholder="Announcement Text" className="flex-1 bg-[#0f172a] border border-red-900 p-2 text-white text-xs rounded"/>
+                                                            <button onClick={() => setAnnouncement({...announcement, active: !announcement.active})} className={`px-3 text-xs font-bold rounded ${announcement.active ? 'bg-blue-600 text-black' : 'bg-gray-700 text-slate-400'}`}>{announcement.active ? 'ON' : 'OFF'}</button>
+                                                        </div>
+                                                        <button onClick={() => db.collection('site_config').doc('announcement').set(announcement, {merge:true})} className="w-full bg-red-900/50 hover:bg-red-900 text-white py-1 rounded text-xs">UPDATE BROADCAST</button>
+                                                    </div>
+
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs uppercase font-bold text-red-400">Hero Headline</label>
+                                                        <input value={heroConfig.headline} onChange={e => setHeroConfig({...heroConfig, headline: e.target.value})} className="w-full bg-[#0f172a] border border-red-900 p-3 text-white rounded"/>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-xs uppercase font-bold text-red-400">Status</label>
+                                                        <input value={heroConfig.status} onChange={e => setHeroConfig({...heroConfig, status: e.target.value})} className="w-full bg-[#0f172a] border border-red-900 p-3 text-white rounded"/>
+                                                    </div>
+                                                    <button onClick={() => db.collection('site_config').doc('hero').set(heroConfig, {merge:true})} className="bg-red-700 text-white px-6 py-2 rounded text-xs font-bold hover:bg-red-600 transition-colors">SAVE HERO</button>
+                                                    
+                                                    <div className="h-px bg-red-900/50 my-6"></div>
+                                                    
+                                                    <div className="grid gap-4">
+                                                        <input type="password" placeholder="Groq API Key" value={siteConfig.groqApiKey} onChange={e => setSiteConfig({...siteConfig, groqApiKey: e.target.value})} className="bg-[#0f172a] border border-red-900 p-3 text-white rounded"/>
+                                                        <input placeholder="Avatar URL" value={siteConfig.avatarUrl || ''} onChange={e => setSiteConfig({...siteConfig, avatarUrl: e.target.value})} className="bg-[#0f172a] border border-red-900 p-3 text-white rounded"/>
+                                                        <input placeholder="LinkedIn Profile URL" value={siteConfig.linkedin || ''} onChange={e => setSiteConfig({...siteConfig, linkedin: e.target.value})} className="bg-[#0f172a] border border-red-900 p-3 text-white rounded"/>
+                                                    </div>
+                                                    <button onClick={() => db.collection('site_config').doc('main').set(siteConfig, {merge:true})} className="mt-4 bg-red-700 text-white px-6 py-2 rounded text-xs font-bold hover:bg-red-600 transition-colors">SAVE CONFIG</button>
+                                                </div>
+                                            )}
+                                            
+                                            {adminTab === 'projects' && (
+                                                <div className="space-y-6">
+                                                    <div className="bg-[#0f172a] border border-red-900 p-6 rounded-xl">
+                                                        <h3 className="text-white font-bold mb-4 text-sm flex justify-between">
+                                                            <span>{editingProject ? 'Edit Project' : 'Add Project'}</span>
+                                                            {editingProject && <button onClick={() => { setEditingProject(null); setNewProject({ title: '', desc: '', tags: '', link: '', priority: 0, isComplex: false, isMedium: false, isTool: false }); }} className="text-xs text-slate-400 hover:text-white">CANCEL</button>}
+                                                        </h3>
+                                                        <div className="grid gap-4">
+                                                            <div className="grid md:grid-cols-3 gap-4">
+                                                                <div className="md:col-span-2">
+                                                                    <input placeholder="Title" value={newProject.title} onChange={e => setNewProject({...newProject, title: e.target.value})} className="w-full bg-slate-900 border border-gray-700 p-3 text-white text-sm rounded focus:border-blue-500"/>
+                                                                </div>
+                                                                <div>
+                                                                    <input type="number" placeholder="Priority (0-100)" value={newProject.priority} onChange={e => setNewProject({...newProject, priority: e.target.value})} className="w-full bg-slate-900 border border-gray-700 p-3 text-white text-sm rounded focus:border-blue-500"/>
+                                                                </div>
+                                                            </div>
+                                                            <textarea placeholder="Description" rows="3" value={newProject.desc} onChange={e => setNewProject({...newProject, desc: e.target.value})} className="bg-slate-900 border border-gray-700 p-3 text-white text-sm rounded focus:border-blue-500"/>
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <input placeholder="Link" value={newProject.link} onChange={e => setNewProject({...newProject, link: e.target.value})} className="bg-slate-900 border border-gray-700 p-3 text-white text-sm rounded focus:border-blue-500"/>
+                                                                <input placeholder="Tags (comma sep)" value={newProject.tags} onChange={e => setNewProject({...newProject, tags: e.target.value})} className="bg-slate-900 border border-gray-700 p-3 text-white text-sm rounded focus:border-blue-500"/>
+                                                            </div>
+                                                            
+                                                            {/* New Badge Checkboxes */}
+                                                            <div className="flex flex-wrap gap-4 p-3 bg-slate-900/50 rounded border border-gray-800">
+                                                                <div className="flex items-center gap-2">
+                                                                    <input 
+                                                                        type="checkbox" 
+                                                                        id="isComplex" 
+                                                                        checked={newProject.isComplex} 
+                                                                        onChange={e => setNewProject({...newProject, isComplex: e.target.checked})} 
+                                                                        className="w-4 h-4 rounded bg-[#0f172a] border-red-500 accent-yellow-500"
+                                                                    />
+                                                                    <label htmlFor="isComplex" className="text-xs text-yellow-500 font-bold">⭐ Flagship (Complex)</label>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <input 
+                                                                        type="checkbox" 
+                                                                        id="isMedium" 
+                                                                        checked={newProject.isMedium} 
+                                                                        onChange={e => setNewProject({...newProject, isMedium: e.target.checked})} 
+                                                                        className="w-4 h-4 rounded bg-[#0f172a] border-blue-500 accent-blue-500"
+                                                                    />
+                                                                    <label htmlFor="isMedium" className="text-xs text-blue-500 font-bold">⚡ Core (Medium)</label>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <input 
+                                                                        type="checkbox" 
+                                                                        id="isTool" 
+                                                                        checked={newProject.isTool} 
+                                                                        onChange={e => setNewProject({...newProject, isTool: e.target.checked})} 
+                                                                        className="w-4 h-4 rounded bg-[#0f172a] border-blue-500 accent-green-500"
+                                                                    />
+                                                                    <label htmlFor="isTool" className="text-xs text-blue-500 font-bold">🛠️ Tool (Utility)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <button onClick={saveProject} className={`py-3 rounded font-bold text-sm text-white transition-colors ${editingProject ? 'bg-blue-600 hover:bg-blue-500' : 'bg-green-700 hover:bg-blue-600'}`}>
+                                                                {editingProject ? 'UPDATE' : 'DEPLOY'}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        {projects.map(p => (
+                                                            <div key={p.id} className={`flex justify-between items-center bg-[#0f172a] p-4 border rounded-lg hover:border-blue-500 transition-colors ${editingProject === p.id ? 'border-blue-500' : 'border-gray-800'}`}>
+                                                                <div>
+                                                                    <div className="text-white font-bold text-sm flex items-center gap-2">
+                                                                        {p.title}
+                                                                        <div className="flex gap-1">
+                                                                            {p.isComplex && <span className="w-2 h-2 rounded-full bg-yellow-500"></span>}
+                                                                            {p.isMedium && <span className="w-2 h-2 rounded-full bg-blue-500"></span>}
+                                                                            {p.isTool && <span className="w-2 h-2 rounded-full bg-blue-500"></span>}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="text-[10px] text-gray-500">Priority: {p.priority || 0}</div>
+                                                                </div>
+                                                                <div className="flex gap-2">
+                                                                    <button onClick={() => startEditProject(p)} className="p-2 bg-blue-900/30 text-blue-400 rounded hover:bg-blue-900"><Icons.Edit size={16}/></button>
+                                                                    <button onClick={() => deleteDoc('projects', p.id)} className="p-2 bg-red-900/30 text-red-400 rounded hover:bg-red-900"><Icons.Trash size={16}/></button>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {adminTab === 'certs' && (
+                                                 <div className="space-y-6">
+                                                     <div className="bg-[#0f172a] border border-red-900 p-6 rounded-xl">
+                                                         <h3 className="text-white font-bold mb-4 text-sm flex justify-between">
+                                                             <span>{editingCert ? 'Edit Certificate' : 'Add Certificate'}</span>
+                                                             {editingCert && <button onClick={() => { setEditingCert(null); setNewCert({ title: '', issuer: '', link: '', imageLink: '', priority: 0, tags: '' }); }} className="text-xs text-slate-400 hover:text-white">CANCEL</button>}
+                                                         </h3>
+                                                         <div className="grid gap-4">
+                                                             <input placeholder="Title" value={newCert.title} onChange={e => setNewCert({...newCert, title: e.target.value})} className="bg-slate-900 border border-gray-700 p-3 text-white text-sm rounded"/>
+                                                             <input placeholder="Issuer" value={newCert.issuer} onChange={e => setNewCert({...newCert, issuer: e.target.value})} className="bg-slate-900 border border-gray-700 p-3 text-white text-sm rounded"/>
+                                                             
+                                                             <div className="grid grid-cols-2 gap-4">
+                                                                 <input type="number" placeholder="Priority (0-100)" value={newCert.priority} onChange={e => setNewCert({...newCert, priority: e.target.value})} className="bg-slate-900 border border-gray-700 p-3 text-white text-sm rounded"/>
+                                                                 <input placeholder="Tags (comma sep)" value={newCert.tags} onChange={e => setNewCert({...newCert, tags: e.target.value})} className="bg-slate-900 border border-gray-700 p-3 text-white text-sm rounded"/>
+                                                             </div>
+
+                                                             <input placeholder="Image URL" value={newCert.imageLink} onChange={e => setNewCert({...newCert, imageLink: e.target.value})} className="bg-slate-900 border border-gray-700 p-3 text-white text-sm rounded"/>
+                                                             <input placeholder="Verify URL" value={newCert.link} onChange={e => setNewCert({...newCert, link: e.target.value})} className="bg-slate-900 border border-gray-700 p-3 text-white text-sm rounded"/>
+                                                             
+                                                             <button onClick={saveCert} className={`py-3 rounded font-bold text-sm text-white transition-colors ${editingCert ? 'bg-blue-600 hover:bg-blue-500' : 'bg-green-700 hover:bg-blue-600'}`}>
+                                                                 {editingCert ? 'UPDATE' : 'ADD'}
+                                                             </button>
+                                                         </div>
+                                                     </div>
+                                                     <div className="grid gap-2">
+                                                         {certifications.map(c => (
+                                                             <div key={c.id} className={`flex justify-between items-center bg-[#0f172a] p-3 border rounded ${editingCert === c.id ? 'border-blue-500' : 'border-gray-800'}`}>
+                                                                 <div>
+                                                                     <div className="text-white text-sm truncate max-w-[200px] font-bold">{c.title}</div>
+                                                                     <div className="text-[10px] text-gray-500">P: {c.priority || 0} | Tags: {c.tags && tags.length || 0}</div>
+                                                                 </div>
+                                                                 <div className="flex gap-2">
+                                                                     <button onClick={() => startEditCert(c)} className="text-blue-500"><Icons.Edit size={16}/></button>
+                                                                     <button onClick={() => deleteDoc('certifications', c.id)} className="text-red-500"><Icons.Trash size={16}/></button>
+                                                                 </div>
+                                                             </div>
+                                                         ))}
+                                                     </div>
+                                                 </div>
+                                            )}
+
+                                            {adminTab === 'inbox' && (
+                                                <div className="space-y-4">
+                                                    {messages.map(m => (
+                                                        <div key={m.id} className="bg-[#0f172a] border border-gray-800 p-5 rounded-lg hover:border-gray-600 transition-colors">
+                                                            <div className="flex justify-between text-red-400 font-bold text-sm mb-2">
+                                                                <span className="flex items-center gap-2"><Icons.User size={14}/> {m.name}</span>
+                                                                <span className="text-gray-600 text-xs font-mono">{m.timestamp && timestamp.seconds ? new Date(m.timestamp.seconds*1000).toLocaleString() : 'Just now'}</span>
+                                                            </div>
+                                                            <div className="flex gap-4 text-xs text-gray-500 mb-3 font-mono border-b border-gray-800 pb-2">
+                                                                <span>COMMS: {m.phone}</span>
+                                                                <span>TYPE: {m.inquiryType}</span>
+                                                            </div>
+                                                            <div className="p-3 bg-red-900/10 border-l-2 border-red-900 text-gray-300 text-sm leading-relaxed">
+                                                                {m.message}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);

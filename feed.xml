@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" 
+     xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+     xmlns:dc="http://purl.org/dc/elements/1.1/" 
+     xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>The Digital Chronicles - Mitanshu Bhasin</title>
+  <link>https://mitanshubhasin.netlify.app/story.html</link>
+  <description>Investigative tech stories, cyber warfare archives, and system architecture deep-dives by Mitanshu Bhasin.</description>
+  <language>en-us</language>
+  <lastBuildDate>Mon, 26 Jan 2026 09:30:00 +0530</lastBuildDate>
+  <atom:link href="https://mitanshubhasin.netlify.app/feed.xml" rel="self" type="application/rss+xml" />
+  
+  <item>
+    <title>From Dark Web Vigilante to SEO Kingpin: The Mitanshu Bhasin Saga</title>
+    <link>https://mitanshubhasin.netlify.app/story.html</link>
+    <guid isPermaLink="true">https://mitanshubhasin.netlify.app/story.html</guid>
+    <pubDate>Mon, 26 Jan 2026 08:00:00 +0530</pubDate>
+    <dc:creator>Mitanshu Bhasin</dc:creator>
+    <description>An investigative look into the life of 'w8kar', the teenager who mastered SEO in 8th grade, commanded a 200-member cyber unit, and is now architecting the future of AI web systems.</description>
+    <content:encoded><![CDATA[
+      <p>Mitanshu Bhasin was born of the screen. While his peers in 2nd grade were learning cursive, he was navigating digital currents. This exclusive coverage explores his journey from Team RG to becoming a System Architect.</p>
+      <p>Explore the full story of cyber warfare, SEO dominance, and the future of web architecture at Mitanshu's official portal.</p>
+    ]]></content:encoded>
+  </item>
+</channel>
+</rss>

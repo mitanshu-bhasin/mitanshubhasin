@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "build": "babel . --out-dir . --extensions .jsx --presets=@babel/preset-env,@babel/preset-react && terser index.js -o index.min.js && terser 404.js -o 404.min.js && terser exp.js -o exp.min.js && terser privacy.js -o privacy.min.js && terser toc.js -o toc.min.js"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.28.6",
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.0",
+    "@babel/preset-react": "^7.28.5",
+    "terser": "^5.46.0"
+  }
+}

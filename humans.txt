@@ -1,0 +1,27 @@
+HUMANSTXT.org / team
+
+/* THE ARCHITECT */
+Name: Mitanshu Bhasin
+Role: System Architect, Full Stack Dev & God Mode User
+Location: Delhi, India
+Vibe: Rebellious, Groovy, Knowledgeable
+Diet: Paranthas (Fuel for Coding)
+
+/* THE TECH STACK */
+Frontend: React.js, Tailwind CSS
+Backend: Firebase (Auth, Firestore)
+Hosting: Netlify
+Design: Cyberpunk / Minimalist
+
+/* QUOTE */
+"We code, we break, we rebuild."
+
+THANKS
+
+To Caffeine, My Keyboard, and the Internet.
+
+SITE
+
+Last update: 2026/01/24
+Standards: HTML5, CSS3, ES6+
+Components: Hacker Mode & God Mode Enabled

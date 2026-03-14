@@ -1,0 +1,7 @@
+SyntaxError: index.jsx: Unexpected token (367:17)
+            };
+            return (
+                <>
+                    <button 
+                        onClick={() => setIsOpen(!isOpen)} 
+                        className={`fixed bottom-6 left-6 z-50 group flex flex-col items-center gap-2 transition-transform hover:scale-105`}
