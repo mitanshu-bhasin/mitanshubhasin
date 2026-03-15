@@ -2,6 +2,9 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
 
+// Firebase API keys are safe to include in client-side code by design.
+// Security is enforced by Firestore Security Rules (see /firestore.rules).
+// See: https://firebase.google.com/docs/projects/api-keys
 const firebaseConfig = {
     apiKey: "AIzaSyC_x18I169I-SBhHlCDqNzQE8hfbTpckOY",
     authDomain: "mitanshu-6a6f6.firebaseapp.com",
