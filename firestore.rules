@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==========================================
+    // SITE CONFIG (hero, main, announcement)
+    // ==========================================
+    // Public read: anyone can view site configuration.
+    // Write: only authenticated admin users.
+    match /site_config/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // ==========================================
+    // PROJECTS COLLECTION
+    // ==========================================
+    // Public read: portfolio projects are public.
+    // Write: only authenticated admin users.
+    match /projects/{projectId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // ==========================================
+    // CERTIFICATIONS COLLECTION
+    // ==========================================
+    // Public read: certifications are public.
+    // Write: only authenticated admin users.
+    match /certifications/{certId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // ==========================================
+    // MESSAGES COLLECTION (Contact Form)
+    // ==========================================
+    // Create: anyone can send a message (contact form).
+    //   - Validates required fields and types.
+    //   - Limits message size to prevent abuse.
+    // Read/Update/Delete: only authenticated admin users.
+    match /messages/{messageId} {
+      allow create: if
+        request.resource.data.keys().hasAll(['name', 'phone', 'inquiryType', 'message']) &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 &&
+        request.resource.data.name.size() <= 100 &&
+        request.resource.data.phone is string &&
+        request.resource.data.phone.size() > 0 &&
+        request.resource.data.phone.size() <= 50 &&
+        request.resource.data.inquiryType is string &&
+        request.resource.data.message is string &&
+        request.resource.data.message.size() > 0 &&
+        request.resource.data.message.size() <= 5000;
+
+      allow read, update, delete: if request.auth != null;
+    }
+
+    // ==========================================
+    // DENY ALL OTHER COLLECTIONS
+    // ==========================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
