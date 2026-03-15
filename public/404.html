@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+
+    <!-- --- SEO OPTIMIZATION (GOD MODE v4.1) --- -->
+    <title>404 Page Not Found | Mitanshu Bhasin</title>
+    <meta name="description"
+        content="Oops! The page you are looking for doesn't exist. It might have been moved or deleted.">
+    <meta name="keywords" content="404, Page Not Found, Mitanshu Bhasin">
+    <meta name="author" content="Mitanshu Bhasin">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="googlebot" content="noindex, nofollow">
+    <link rel="canonical" href="https://mitanshubhasin.netlify.app/404.html">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Open Graph / Facebook / LinkedIn -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mitanshubhasin.netlify.app/404.html">
+    <meta property="og:title" content="404 Page Not Found | Mitanshu Bhasin">
+    <meta property="og:description" content="Oops! The page you are looking for doesn't exist.">
+    <meta property="og:image" content="https://mitanshubhasin.netlify.app/og-image.jpg">
+    <meta property="og:site_name" content="Mitanshu Bhasin Portfolio">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://mitanshubhasin.netlify.app/404.html">
+    <meta name="twitter:title" content="404 Page Not Found | Mitanshu Bhasin">
+    <meta name="twitter:description" content="Oops! The page you are looking for doesn't exist.">
+    <meta name="twitter:image" content="https://mitanshubhasin.netlify.app/og-image.jpg">
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Mitanshu Bhasin",
+      "url": "https://mitanshubhasin.netlify.app",
+      "jobTitle": "System Architect",
+      "image": "https://mitanshubhasin.netlify.app/og-image.jpg",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Delhi",
+        "addressCountry": "India"
+      },
+      "sameAs": [
+        "https://instagram.com/mitanshubhasin",
+        "https://github.com/mitanshu-bhasin",
+        "https://linkedin.com/in/mitanshubhasin",
+        "https://facebook.com/mitanshubhasin",
+        "https://www.threads.net/@mitanshubhasin",
+        "https://www.instagram.com/cyber.mitanshu/",
+        "https://linktr.ee/mitanshubhasin",
+        "https://cyberserpent.netlify.app/",
+        "https://mb-study.netlify.app/",
+        "https://dev.to/t/mitanshubhasin"
+      ],
+      "knowsAbout": ["React", "Firebase", "System Architecture", "Python", "Ethical Hacking", "Linux Server Management"]
+    }
+    </script>
+
+    <!-- React & Tailwind -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@300;400;600&family=Orbitron:wght@400;700;900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* --- GLOBAL & TRANSITIONS --- */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s ease;
+            overflow-x: hidden;
+            cursor: none;
+            /* Hide Default Cursor */
+        }
+
+        @media (max-width: 768px) {
+            body {
+                cursor: auto;
+            }
+        }
+
+        /* --- CUSTOM CURSOR --- */
+        .cursor-dot,
+        .cursor-follower {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99999;
+            transition: transform 0.1s ease, width 0.3s, height 0.3s, background-color 0.3s;
+        }
+
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #0ea5e9;
+            /* Light Blue default */
+        }
+
+        .theme-cyber .cursor-dot {
+            background-color: #3b82f6;
+            /* Green */
+            box-shadow: 0 0 10px #3b82f6;
+        }
+
+        .cursor-follower {
+            width: 30px;
+            height: 30px;
+            border: 1px solid rgba(14, 165, 233, 0.5);
+            transition: transform 0.15s ease-out, width 0.3s, height 0.3s;
+        }
+
+        .theme-cyber .cursor-follower {
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+        }
+
+        .cursor-hover .cursor-follower {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(14, 165, 233, 0.1);
+            border-color: transparent;
+        }
+
+        .theme-cyber .cursor-hover .cursor-follower {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        /* --- TERMINAL MODAL --- */
+        .terminal-overlay {
+            animation: fadeIn 0.3s ease-out;
+            backdrop-filter: blur(5px);
+        }
+
+        .terminal-window {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* --- THEME: LIGHT (NEURAL ARCHITECT) --- */
+        body.theme-light {
+            background-color: #f8fafc;
+            color: #1e293b;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .theme-light .accent-text {
+            color: #2563eb;
+        }
+
+        .theme-light .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        /* --- THEME: CYBER (HACKER MODE) --- */
+        body.theme-cyber {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .theme-cyber .font-heading {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .theme-cyber .glass-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 {
+            transition-delay: 100ms;
+        }
+
+        .reveal-delay-2 {
+            transition-delay: 200ms;
+        }
+
+        .reveal-delay-3 {
+            transition-delay: 300ms;
+        }
+
+        /* Skill Bar Animation Trigger */
+        .skill-bar-fill {
+            width: 0;
+            transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .reveal.active .skill-bar-fill {
+            width: var(--target-width);
+        }
+
+        .tilt-card {
+            transition: transform 0.1s;
+            transform-style: preserve-3d;
+        }
+
+        /* Modal Animation */
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .animate-zoom {
+            animation: zoomIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .scroll-progress-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        body.theme-light .scroll-progress-bar {
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+        }
+
+        body.theme-cyber .scroll-progress-bar {
+            background: #3b82f6;
+            box-shadow: 0 0 10px #3b82f6;
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.2));
+            background-size: 100% 4px;
+            z-index: 90;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        body.theme-cyber .scanlines {
+            opacity: 0.6;
+        }
+
+        /* Announcement Bar Animation */
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slideDown {
+            animation: slideDown 0.5s ease-out forwards;
+        }
+
+        /* Glitch Text */
+        .glitch-text {
+            position: relative;
+        }
+
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -1px 0 red;
+            clip-path: inset(0 0 0 0);
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+            display: none;
+        }
+
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -1px 0 blue;
+            clip-path: inset(0 0 0 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+            display: none;
+        }
+
+        body.theme-cyber .glitch-text::before,
+        body.theme-cyber .glitch-text::after {
+            display: block;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% {
+                clip-path: inset(20% 0 80% 0);
+            }
+
+            20% {
+                clip-path: inset(60% 0 10% 0);
+            }
+
+            40% {
+                clip-path: inset(40% 0 50% 0);
+            }
+
+            60% {
+                clip-path: inset(80% 0 5% 0);
+            }
+
+            80% {
+                clip-path: inset(10% 0 70% 0);
+            }
+
+            100% {
+                clip-path: inset(30% 0 50% 0);
+            }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% {
+                clip-path: inset(10% 0 60% 0);
+            }
+
+            20% {
+                clip-path: inset(30% 0 20% 0);
+            }
+
+            40% {
+                clip-path: inset(70% 0 10% 0);
+            }
+
+            60% {
+                clip-path: inset(20% 0 50% 0);
+            }
+
+            80% {
+                clip-path: inset(60% 0 20% 0);
+            }
+
+            100% {
+                clip-path: inset(40% 0 30% 0);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        body.theme-light ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        body.theme-light ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+
+        body.theme-cyber ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        body.theme-cyber ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border: 1px solid #1e293b;
+        }
+
+        #preloader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fira Code', monospace;
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body class="theme-light">
+    <div id="root"></div>
+
+    <script src="404.min.js" defer></script>
+</body>
+
+</html>

@@ -7,3 +7,5 @@ index_test.js
 test.js
 test.jsx
 *.tmp
+dist/
+.vite/
