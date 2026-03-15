@@ -1,7 +1,2 @@
-Netlify SPA Redirect Rule
-
-/* /index.html   200
-
-Custom 404 Rule (Optional, as Netlify auto-detects 404.html)
-
-/404  /404.html     404
+# SPA Redirect Rule (works on Netlify and Cloudflare Pages)
+/*    /index.html   200
